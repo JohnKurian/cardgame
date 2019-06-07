@@ -191,7 +191,7 @@ def pick_resurrect():
     power_2_average = sum(power_2_list) / len(power_2_list)
     power_3_average = sum(power_3_list) / len(power_3_list)
 
-    if max([power_0_average, power_1_average, power_2_average, power_3_average]) >= 90:
+    if max([power_0_average, power_1_average, power_2_average, power_3_average]) >= 80:
       return True
     else:
       return False
@@ -247,6 +247,12 @@ while len(player_one.cards) > 0 and len(player_two.cards) > 0:
     if player_two.is_resurrect_spell_available and pick_resurrect():
       print('CPU is picking resurrect')
       option = 'r'
+    elif player_two.is_god_spell_available and random.choice([True, False]) and len(player_one.cards)>=3:
+        print('CPU is picking god spell')
+        option = 'g'
+    elif god_spell_used or resurrect_spell_used:
+        print('CPU chooses pass')
+        option = 'p'
     else:
       print('CPU picks battle.')
       option = 'b'
@@ -295,7 +301,11 @@ while len(player_one.cards) > 0 and len(player_two.cards) > 0:
             resurrect_spell_used = True
             if god_spell_used:
               print('player 2 has the option to choose the resurrected card or the previously chosen card. To pick the previously chosen card, press y, else press n.')
-              change = input()
+              if player_two.is_CPU:
+                  change = random.choice(['y','n'])
+                  print('CPU chooses', change)
+              else:
+                  change = input()
               if change == 'y':
                 player_one.push_card_to_top(1)
               else:
@@ -336,7 +346,13 @@ while len(player_one.cards) > 0 and len(player_two.cards) > 0:
   elif option=='g':
     if not god_spell_used and not resurrect_spell_used:
       print('select which card of the opponent to be played')
-      card_number = input()
+      if player_two.has_next_move and player_two.is_CPU:
+          print('CPU picking card from player 1 deck.')
+          card_number = random.randrange(1, len(player_one.cards) - 1)
+          print('CPU picked:', card_number)
+      else:
+        card_number = input()
+
       if player_one.has_next_move:
         if player_one.is_god_spell_available:
           player_two.push_card_to_top(int(card_number))
