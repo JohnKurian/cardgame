@@ -296,7 +296,7 @@ while len(player_one.cards) > 0 and len(player_two.cards) > 0:
     
   if option == 'b':
     if ((god_spell_used or resurrect_spell_used) and countered) or (not god_spell_used and not resurrect_spell_used):
-      print('Pick a power number to compare. Press c to cancel')
+      print('Pick a power number to compare(Range: 0-3). Press c to cancel')
       if player_two.has_next_move and  player_two.is_CPU:
         print('CPU picks the card.')
         a = list(player_two.top_card.values())[1:]
@@ -304,6 +304,14 @@ while len(player_one.cards) > 0 and len(player_two.cards) > 0:
         print('The power number picked by CPU:', power_number)
       else:  
         power_number = input()
+        if power_number.isalpha() or len(power_number) == 0:
+          print("Invalid power number. The range is 0-3. Please try again")
+          time.sleep(1)
+          continue
+        if not (int(power_number) >= 0 and int(power_number) <= 3) :
+          print("Invalid power number. The range is 0-3. Please try again")
+          time.sleep(1)
+          continue
       if power_number == 'c':
         continue
 
@@ -336,7 +344,7 @@ while len(player_one.cards) > 0 and len(player_two.cards) > 0:
                 pass
 
         else:
-          print('Cannot use resurrect. top card has been revealed.')
+          print('Cannot use resurrect. Top card has been revealed.')
           time.sleep(1)
       else:
         if not player_two.top_card_revealed:
@@ -355,7 +363,7 @@ while len(player_one.cards) > 0 and len(player_two.cards) > 0:
               else:
                 pass
         else:
-          print('Cannot use resurrect. top card has been revealed.')
+          print('Cannot use resurrect. Top card has been revealed.')
           time.sleep(1)
     else:
       print('Cannot use spell.')
