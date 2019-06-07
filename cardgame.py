@@ -1,4 +1,5 @@
 import random
+import time
 
 
 outdated_deck = []
@@ -10,6 +11,7 @@ god_spell_used = False
 resurrect_spell_used = False
 countered = False
 is_CPU = False
+round_number = 1
 
 
 class Player:
@@ -58,16 +60,15 @@ class Player:
       try:
         if self.is_resurrect_spell_available:
           print('player '+ self.name + ' has used the resurrect spell.')
-          print(outdated_deck)
           chosen_outdated_card_index = random.randint(0,len(outdated_deck)-1)
           self.cards = [outdated_deck[chosen_outdated_card_index]] + self.cards
           self.top_card = outdated_deck[chosen_outdated_card_index]
           del outdated_deck[chosen_outdated_card_index]
-          print('the card obtained is:', self.top_card)
+          print('The card obtained is:', self.top_card)
           self.is_resurrect_spell_available = False
           return True
         else:
-          print('resurrect spell already used.')
+          print('Resurrect spell already used.')
           return False
 
       except ValueError:
@@ -83,45 +84,54 @@ class Player:
 def roll_dice():
   roll_1 = random.randint(1,6)
   roll_2 = random.randint(1,6)
-  print('player 1 rolled:', roll_1)
-  print('player 2 rolled:', roll_2)
+  print('Player 1 rolled:', roll_1)
+  print('Player 2 rolled:', roll_2)
   if roll_1 > roll_2:
-    print('player 1 goes first')
+    print('PLAYER 1 GOES FIRST')
     player_one.set_next_move_true()
     return 1
   elif roll_1 == roll_2:
-    print('both players rolled the same number. Rolling again..')
+    print('Both players rolled the same number. Rolling again..')
     roll_dice()
   else:
-    print('player 2 goes first')
+    print('PLAYER 2 GOES FIRST')
     player_two.set_next_move_true()
     return 2
 
 def display_points():
-  print('player one points: ', player_one.points)
-  print('player two points: ', player_two.points)
+  print('=== points table ===')
+  print('Player 1 points: ', player_one.points)
+  print('Player 2 points: ', player_two.points)
+  print('====================')
 
 def compare_top_cards(power_number):
   global god_spell_used
   global resurrect_spell_used
+  global round_number
   
   if player_one.top_card['power_' + power_number] > player_two.top_card['power_' + power_number]:
-    print('player one won the duel')
+    print('Player 1 won the duel')
+    time.sleep(1)
     player_one.add_point()
     player_one.has_next_move = True
     player_two.has_next_move = False
   else: 
-    print('player two won the duel')
+    print('Player 2 won the duel')
+    time.sleep(1)
     player_two.add_point()
     player_one.has_next_move = False
     player_two.has_next_move = True
-    
-  print('the top card of player 1:', player_one.top_card)
-  print('the top card of player 2:', player_two.top_card)
-  
-  print('adding to the outdated deck.')
+
+  print('\n')
+  print('The top card of player 1:', player_one.top_card)
+  print('The top card of player 2:', player_two.top_card)
+
+  print('\n')
+  print('ADDING TO THE OUTDATED DECK.')
+  print('\n')
   outdated_deck.append(player_one.remove_top_card())
   outdated_deck.append(player_two.remove_top_card())
+  time.sleep(1)
   
   player_one.top_card_revealed = False
   player_two.top_card_revealed = False
@@ -131,13 +141,15 @@ def compare_top_cards(power_number):
   if resurrect_spell_used:
     resurrect_spell_used = False
 
+  round_number += 1
+
 def create_players(is_CPU):
   global player_one, player_two
-  player_one = Player('one', False)
+  player_one = Player('1', False)
   if is_CPU:
-    player_two = Player('two', True)
+    player_two = Player('2', True)
   else:
-    player_two = Player('two', False)
+    player_two = Player('2', False)
 
 def populate_deck():
   global cards
@@ -199,26 +211,33 @@ def pick_resurrect():
     return False
 
 
-print('''\n welcome to the card game. Press x to exit at any point in the game. Press any key to continue. 
-      \n Press h to show list of commands.''')
+print('''\n Welcome to the card game. Press x to exit at any point in the game. Press any key to continue.''')
 print('Press 1 for CPU, 2 for player')
 choice = input()
 if int(choice) == 1:
   is_CPU = True
   
-
-print('creating players..')
+print('\n')
+print('Creating players..')
 create_players(is_CPU)
-print('populating deck...')
+time.sleep(1)
+print('Populating deck...')
 populate_deck()
-print('dealing cards to players...')
+time.sleep(1)
+print('Dealing cards to players...')
 deal_cards_to_players()
-print('rolling dice..')
+time.sleep(1)
+print('Rolling dice..')
 roll_dice()
+time.sleep(1)
 print('\n')
 
 while len(player_one.cards) > 0 and len(player_two.cards) > 0:
-  print('press enter to continue. press x to quit. p for points. o for outdated deck')
+  print("====================")
+  print("ROUND: ", round_number)
+  print("====================")
+  display_points()
+  print('MAIN MENU: Press enter to continue the game. press x to quit.')
   option = input()
   if option == 'x':
     print('Exiting the game.')
@@ -226,35 +245,39 @@ while len(player_one.cards) > 0 and len(player_two.cards) > 0:
     
   elif option == 'p':
     print('Points table:')
-    print('player 1:', player_one.points)
-    print('player 2:', player_two.points)
+    print('Player 1:', player_one.points)
+    print('Player 2:', player_two.points)
     
   elif option == 'o':
-    print('outdated deck:', outdated_deck)
+    print('Outdated deck:', outdated_deck)
 
   if player_one.has_next_move:
-    print('\nplayer 1 move next. Type b to battle. s to show the card. r to resurrect. g for god spell.')
+    print('\nPlayer 1 move next. Type b to battle. s to show the card. r to resurrect. g for god spell.')
     if god_spell_used or resurrect_spell_used:
-      print('press p to pass')
+      print('Press p to pass')
 
   elif player_two.has_next_move:
-    print('\n player 2 move next. Type b to battle. s to show the card. r to resurrect. g for god spell.')
+    print('\nPlayer 2 move next. Type b to battle. s to show the card. r to resurrect. g for god spell.')
     if god_spell_used or resurrect_spell_used:
-      print('press p to pass')
+      print('Press p to pass')
     
     
   if player_two.has_next_move and player_two.is_CPU:
     if player_two.is_resurrect_spell_available and pick_resurrect():
       print('CPU is picking resurrect')
+      time.sleep(1)
       option = 'r'
     elif player_two.is_god_spell_available and random.choice([True, False]) and len(player_one.cards)>=3:
         print('CPU is picking god spell')
+        time.sleep(1)
         option = 'g'
     elif god_spell_used or resurrect_spell_used:
         print('CPU chooses pass')
+        time.sleep(1)
         option = 'p'
     else:
       print('CPU picks battle.')
+      time.sleep(1)
       option = 'b'
   else: 
     option = input()
@@ -272,7 +295,7 @@ while len(player_one.cards) > 0 and len(player_two.cards) > 0:
     
   if option == 'b':
     if ((god_spell_used or resurrect_spell_used) and countered) or (not god_spell_used and not resurrect_spell_used):
-      print('pick a power number to compare. Press c to cancel')
+      print('Pick a power number to compare. Press c to cancel')
       if player_two.has_next_move and  player_two.is_CPU:
         print('CPU picks the card.')
         a = list(player_two.top_card.values())[1:]
@@ -285,7 +308,7 @@ while len(player_one.cards) > 0 and len(player_two.cards) > 0:
 
       compare_top_cards(power_number)
     else:
-      print("can't battle.")
+      print("Can't battle.")
     
     
   elif option == 'r':
@@ -300,7 +323,7 @@ while len(player_one.cards) > 0 and len(player_two.cards) > 0:
               countered = True
             resurrect_spell_used = True
             if god_spell_used:
-              print('player 2 has the option to choose the resurrected card or the previously chosen card. To pick the previously chosen card, press y, else press n.')
+              print('Player 2 has the option to choose the resurrected card or the previously chosen card. To pick the previously chosen card, press y, else press n.')
               if player_two.is_CPU:
                   change = random.choice(['y','n'])
                   print('CPU chooses', change)
@@ -312,7 +335,7 @@ while len(player_one.cards) > 0 and len(player_two.cards) > 0:
                 pass
 
         else:
-          print('cannot use resurrect. top card has been revealed.')
+          print('Cannot use resurrect. top card has been revealed.')
       else:
         if not player_two.top_card_revealed:
           is_resurrected = player_two.use_resurrect_spell()
@@ -323,16 +346,16 @@ while len(player_one.cards) > 0 and len(player_two.cards) > 0:
               countered = True
             resurrect_spell_used = True
             if god_spell_used:
-              print('player 1 has the option to choose the resurrected card or the previously chosen card. To pick the previously chosen card, press y, else press n.')
+              print('Player 1 has the option to choose the resurrected card or the previously chosen card. To pick the previously chosen card, press y, else press n.')
               change = input()
               if change == 'y':
                 player_two.push_card_to_top(1)
               else:
                 pass
         else:
-          print('cannot use resurrect. top card has been revealed.')
+          print('Cannot use resurrect. top card has been revealed.')
     else:
-      print('cannot use spell.')
+      print('Cannot use spell.')
     
   elif option == 's':
     if player_one.has_next_move is True:
@@ -345,57 +368,60 @@ while len(player_one.cards) > 0 and len(player_two.cards) > 0:
       
   elif option=='g':
     if not god_spell_used and not resurrect_spell_used:
-      print('select which card of the opponent to be played')
+      print('Select which card of the opponent to be played')
       if player_two.has_next_move and player_two.is_CPU:
           print('CPU picking card from player 1 deck.')
-          card_number = random.randrange(1, len(player_one.cards) - 1)
+          card_number = random.randrange(2, len(player_one.cards))
           print('CPU picked:', card_number)
       else:
         card_number = input()
 
       if player_one.has_next_move:
         if player_one.is_god_spell_available:
-          player_two.push_card_to_top(int(card_number))
+          player_two.push_card_to_top(int(card_number)-1)
           player_one.is_god_spell_available = False
           player_one.has_next_move = False
           player_two.has_next_move = True
           if god_spell_used or resurrect_spell_used:
             countered = True
           god_spell_used = True
+          print('God spell has been used by player 1. Card ' + card_number + " has been pushed to the top of player 2 deck.")
         else:
-          print('already used god spell.')
+          print('Already used god spell.')
 
       else:
         if player_two.is_god_spell_available:
-          player_one.push_card_to_top(int(card_number))
+          player_one.push_card_to_top(int(card_number)-1)
           player_two.is_god_spell_available = False
           player_two.has_next_move = False
           player_one.has_next_move = True
           if god_spell_used or resurrect_spell_used:
             countered = True
           god_spell_used = True
+          print('God spell has been used by player 2. Card ' + card_number + "has been pushed to the top of player 1 deck.")
         else:
-          print('already used god spell.')
+          print('Already used god spell.')
     else:
       if resurrect_spell_used and not countered:
-        print('cannot use god spell as its not the player round')
+        print('Cannot use god spell as its not the player round')
       elif god_spell_used and not countered:
-        print('cannot use god spell as god spell used by the opponent.')
+        print('Cannot use god spell as god spell used by the opponent.')
       else:
-        print('cannot use spell.')
+        print('Cannot use spell.')
     
   else:
     pass
 
 if len(player_one.cards) == 0 or len(player_two.cards) == 0:
-  print('game is over.')
-  print('player 1:', player_one.points)
-  print('player 2:', player_two.points)
+  print('=============')
+  print('Game is over.')
+  print('Player 1:', player_one.points)
+  print('Player 2:', player_two.points)
   if player_one.points > player_two.points:
-    print('player 1 won the game.')
+    print('&&& Player 1 won the game. &&&')
   elif player_one.points == player_two.points:
     print("It's a draw.")
   else:
-    print('player 2 won the game.')
-
+    print('&&& Player 2 won the game. &&&')
+  print('=============')
 
