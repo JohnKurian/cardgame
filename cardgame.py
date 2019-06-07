@@ -334,6 +334,7 @@ while len(player_one.cards) > 0 and len(player_two.cards) > 0:
 
         else:
           print('Cannot use resurrect. top card has been revealed.')
+          time.sleep(1)
       else:
         if not player_two.top_card_revealed:
           is_resurrected = player_two.use_resurrect_spell()
@@ -352,8 +353,10 @@ while len(player_one.cards) > 0 and len(player_two.cards) > 0:
                 pass
         else:
           print('Cannot use resurrect. top card has been revealed.')
+          time.sleep(1)
     else:
       print('Cannot use spell.')
+      time.sleep(1)
     
   elif option == 's':
     if player_one.has_next_move is True:
@@ -376,6 +379,7 @@ while len(player_one.cards) > 0 and len(player_two.cards) > 0:
           print('CPU picking card from player 1 deck.')
           card_number = random.randrange(2, len(player_one.cards))
           print('CPU picked:', card_number)
+          time.sleep(1)
       else:
         card_number = input()
         if (int(card_number) > len(player_two.cards) or int(card_number) < 2) and player_one.has_next_move:
@@ -396,9 +400,11 @@ while len(player_one.cards) > 0 and len(player_two.cards) > 0:
           if god_spell_used or resurrect_spell_used:
             countered = True
           god_spell_used = True
-          print('God spell has been used by player 1. Card ' + card_number + " has been pushed to the top of player 2 deck.")
+          print('God spell has been used by player 1. Card ' + str(card_number) + " has been pushed to the top of player 2 deck.")
+          time.sleep(1)
         else:
           print('Already used god spell.')
+          time.sleep(1)
 
       else:
         if player_two.is_god_spell_available:
@@ -409,16 +415,21 @@ while len(player_one.cards) > 0 and len(player_two.cards) > 0:
           if god_spell_used or resurrect_spell_used:
             countered = True
           god_spell_used = True
-          print('God spell has been used by player 2. Card ' + card_number + " has been pushed to the top of player 1 deck.")
+          print('God spell has been used by player 2. Card ' + str(card_number) + " has been pushed to the top of player 1 deck.")
+          time.sleep(1)
         else:
           print('Already used god spell.')
+          time.sleep(1)
     else:
       if resurrect_spell_used and not countered:
         print('Cannot use god spell as its not the player round')
+        time.sleep(1)
       elif god_spell_used and not countered:
         print('Cannot use god spell as god spell used by the opponent.')
+        time.sleep(1)
       else:
         print('Cannot use spell.')
+        time.sleep(1)
     
   else:
     pass
