@@ -60,6 +60,7 @@ class Player:
       try:
         if self.is_resurrect_spell_available:
           print('player '+ self.name + ' has used the resurrect spell.')
+          time.sleep(1)
           chosen_outdated_card_index = random.randint(0,len(outdated_deck)-1)
           self.cards = [outdated_deck[chosen_outdated_card_index]] + self.cards
           self.top_card = outdated_deck[chosen_outdated_card_index]
@@ -69,10 +70,12 @@ class Player:
           return True
         else:
           print('Resurrect spell already used.')
+          time.sleep(1)
           return False
 
       except ValueError:
         print('Cannot use the resurrect spell. No cards are there in the outdated deck.')
+        time.sleep(1)
         return False
 
     def add_point(self):
@@ -261,11 +264,11 @@ while len(player_one.cards) > 0 and len(player_two.cards) > 0:
     
     
   if player_two.has_next_move and player_two.is_CPU:
-    if player_two.is_resurrect_spell_available and pick_resurrect():
+    if player_two.is_resurrect_spell_available and (not countered) and pick_resurrect():
       print('CPU is picking resurrect')
       time.sleep(1)
       option = 'r'
-    elif player_two.is_god_spell_available and random.choice([True, False]) and len(player_one.cards)>=3:
+    elif player_two.is_god_spell_available and not (god_spell_used or resurrect_spell_used) and random.choice([True, False]) and len(player_one.cards)>=3:
         print('CPU is picking god spell')
         time.sleep(1)
         option = 'g'
@@ -374,6 +377,7 @@ while len(player_one.cards) > 0 and len(player_two.cards) > 0:
         print('Player 2 has ' + str(len(player_two.cards)) + ' cards')
       else:
         print('Player 1 has ' + str(len(player_one.cards)) + ' cards')
+      time.sleep(1)
 
       if player_two.has_next_move and player_two.is_CPU:
           print('CPU picking card from player 1 deck.')
