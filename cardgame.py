@@ -49,28 +49,6 @@ class Player:
       return removed_card
 
 
-    def show_move_options(self):
-      if len(self.cards) > 0:
-        print('has next move: ',self.has_next_move )
-        print('press 1 to use top card:')
-        if self.is_god_spell_available:
-          print('press 2 to use god spell:')
-        else:
-          print('god spell is not available')
-
-        if self.is_resurrect_spell_available:
-          print('press 3 to use resurrect spell:')
-        else:
-          print('resurrect spell is not available')
-      else:
-        print('no cards are available')
-
-
-
-    def use_god_spell(self, card_number, push_opponent_card_to_top):
-      push_opponent_card_to_top(card_number)
-      pass
-
     def push_card_to_top(self, card_number):
       card_to_be_pushed = self.cards.pop(card_number)
       self.cards = [card_to_be_pushed] + self.cards
@@ -105,10 +83,15 @@ class Player:
 def roll_dice():
   roll_1 = random.randint(1,6)
   roll_2 = random.randint(1,6)
+  print('player 1 rolled:', roll_1)
+  print('player 2 rolled:', roll_2)
   if roll_1 > roll_2:
     print('player 1 goes first')
     player_one.set_next_move_true()
     return 1
+  elif roll_1 == roll_2:
+    print('both players rolled the same number. Rolling again..')
+    roll_dice()
   else:
     print('player 2 goes first')
     player_two.set_next_move_true()
@@ -190,28 +173,30 @@ def deal_cards_to_players():
       chosen_cards.append(chosen_card_number)
 
 def pick_resurrect():
-  power_0_list = []
-  power_1_list = []
-  power_2_list = []
-  power_3_list = []
+  global outdated_deck
+  if len(outdated_deck) > 0:
+    power_0_list = []
+    power_1_list = []
+    power_2_list = []
+    power_3_list = []
 
-  for outdated_card in outdated_deck:
-    power_0_list.append(outdated_card['power_0'])
-    power_1_list.append(outdated_card['power_1'])
-    power_2_list.append(outdated_card['power_2'])
-    power_3_list.append(outdated_card['power_3'])
+    for outdated_card in outdated_deck:
+      power_0_list.append(outdated_card['power_0'])
+      power_1_list.append(outdated_card['power_1'])
+      power_2_list.append(outdated_card['power_2'])
+      power_3_list.append(outdated_card['power_3'])
 
-  power_0_average = sum(power_0_list) / len(power_0_list)
-  power_1_average = sum(power_1_list) / len(power_1_list)
-  power_2_average = sum(power_2_list) / len(power_2_list)
-  power_3_average = sum(power_3_list) / len(power_3_list)
+    power_0_average = sum(power_0_list) / len(power_0_list)
+    power_1_average = sum(power_1_list) / len(power_1_list)
+    power_2_average = sum(power_2_list) / len(power_2_list)
+    power_3_average = sum(power_3_list) / len(power_3_list)
 
-  if max([power_0_average, power_1_average, power_2_average, power_3_average]) > 90:
-    print('good deck')
-    print(power_0_average, power_1_average, power_2_average, power_3_average)
+    if max([power_0_average, power_1_average, power_2_average, power_3_average]) >= 90:
+      return True
+    else:
+      return False
   else:
-    print('bad deck')
-    print(power_0_average, power_1_average, power_2_average, power_3_average)
+    return False
 
 
 print('''\n welcome to the card game. Press x to exit at any point in the game. Press any key to continue. 
@@ -230,6 +215,7 @@ print('dealing cards to players...')
 deal_cards_to_players()
 print('rolling dice..')
 roll_dice()
+print('\n')
 
 while len(player_one.cards) > 0 and len(player_two.cards) > 0:
   print('press enter to continue. press x to quit. p for points. o for outdated deck')
@@ -239,6 +225,7 @@ while len(player_one.cards) > 0 and len(player_two.cards) > 0:
     break
     
   elif option == 'p':
+    print('Points table:')
     print('player 1:', player_one.points)
     print('player 2:', player_two.points)
     
@@ -257,8 +244,12 @@ while len(player_one.cards) > 0 and len(player_two.cards) > 0:
     
     
   if player_two.has_next_move and player_two.is_CPU:
-    print('CPU picks battle.')
-    option = 'b'
+    if player_two.is_resurrect_spell_available and pick_resurrect():
+      print('CPU is picking resurrect')
+      option = 'r'
+    else:
+      print('CPU picks battle.')
+      option = 'b'
   else: 
     option = input()
     
@@ -280,6 +271,7 @@ while len(player_one.cards) > 0 and len(player_two.cards) > 0:
         print('CPU picks the card.')
         a = list(player_two.top_card.values())[1:]
         power_number = str(a.index(max(a)))
+        print('The power number picked by CPU:', power_number)
       else:  
         power_number = input()
       if power_number == 'c':
@@ -301,6 +293,13 @@ while len(player_one.cards) > 0 and len(player_two.cards) > 0:
             if god_spell_used or resurrect_spell_used:
               countered = True
             resurrect_spell_used = True
+            if god_spell_used:
+              print('player 2 has the option to choose the resurrected card or the previously chosen card. To pick the previously chosen card, press y, else press n.')
+              change = input()
+              if change == 'y':
+                player_one.push_card_to_top(1)
+              else:
+                pass
 
         else:
           print('cannot use resurrect. top card has been revealed.')
@@ -313,12 +312,19 @@ while len(player_one.cards) > 0 and len(player_two.cards) > 0:
             if god_spell_used or resurrect_spell_used:
               countered = True
             resurrect_spell_used = True
+            if god_spell_used:
+              print('player 1 has the option to choose the resurrected card or the previously chosen card. To pick the previously chosen card, press y, else press n.')
+              change = input()
+              if change == 'y':
+                player_two.push_card_to_top(1)
+              else:
+                pass
         else:
           print('cannot use resurrect. top card has been revealed.')
     else:
       print('cannot use spell.')
     
-  elif(option == 's'):
+  elif option == 's':
     if player_one.has_next_move is True:
       print(player_one.top_card)
       player_one.top_card_revealed = True
@@ -327,7 +333,7 @@ while len(player_one.cards) > 0 and len(player_two.cards) > 0:
       print(player_two.top_card)
       player_two.top_card_revealed = True
       
-  elif(option=='g'):
+  elif option=='g':
     if not god_spell_used and not resurrect_spell_used:
       print('select which card of the opponent to be played')
       card_number = input()
