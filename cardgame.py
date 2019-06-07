@@ -272,7 +272,7 @@ while len(player_one.cards) > 0 and len(player_two.cards) > 0:
         print('CPU is picking god spell')
         time.sleep(1)
         option = 'g'
-    elif god_spell_used or resurrect_spell_used:
+    elif (god_spell_used or resurrect_spell_used) and not countered and (not player_two.is_resurrect_spell_available):
         print('CPU chooses pass')
         time.sleep(1)
         option = 'p'
